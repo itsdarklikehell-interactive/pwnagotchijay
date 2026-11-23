@@ -1,40 +1,23 @@
-name: Generate Gource Video
+name: Gource visualization
 
 on:
-  schedule:
-    - cron: '0 3 1 * *'
+  push:
+    branches: [noai]
+    paths-ignore:
+      - "gource.mp4"
+  pull_request:
+    branches: [noai]
+    paths-ignore:
+      - "gource.mp4"
   workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
   gource:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v5
-        with:
-          fetch-depth: 0
-
-      - name: Install dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y gource ffmpeg
-
-      - name: Generate Gource video
-        run: |
-          gource -1920x1080 -o gource.mp4 \
-            --title "pwnagotchijay" \
-            --hide filenames,progress,users,mouse \
-            --seconds-per-day 0.1 \
-            --auto-skip-seconds 0.2 \
-            --multi-sampling \
-            --stop-at-end
-
-      - name: Commit and push
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add gource.mp4
-          git diff --staged --quiet || git commit -m "chore: update gource video"
-          git push
+    uses: itsdarklikehell-interactive/ci-templates/.github/workflows/gource-reusable.yml@5d44fcd97f6ea8cf05ae6f0298fe84ac56829cba
+    permissions:
+      contents: write
+      actions: read
+      pull-requests: write
